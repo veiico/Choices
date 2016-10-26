@@ -4,8 +4,8 @@ import rootReducer from './../reducers/index.js';
 export default class Store {
   constructor() {
     this.store = createStore(
-      rootReducer
-      , window.devToolsExtension ? window.devToolsExtension() : undefined
+      rootReducer,
+      window.devToolsExtension ? window.devToolsExtension() : undefined
     );
   }
 

@@ -38,7 +38,7 @@ module.exports = function(env) {
           include: path.join(__dirname, 'assets/scripts/src'),
         }]
       }
-    }
+    };
 
   if (minimize) {
     config.plugins.unshift(new webpack.optimize.UglifyJsPlugin({
@@ -57,5 +57,4 @@ module.exports = function(env) {
   }
 
   return config;
-
 };

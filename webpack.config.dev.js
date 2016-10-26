@@ -18,9 +18,6 @@ module.exports = {
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
-  eslint: {
-    configFile: '.eslintrc'
-  },
   plugins: [
     new DashboardPlugin(dashboard.setData),
     new webpack.HotModuleReplacementPlugin(),
@@ -31,11 +28,20 @@ module.exports = {
     })
   ],
   module: {
-    loaders: [{
-      test: /\.js$/,
-      exclude: /(node_modules|bower_components)/,
-      loaders: ['babel', 'eslint-loader'],
-      include: path.join(__dirname, 'assets/scripts/src')
-    }]
+    loaders: [
+      {
+        enforce: 'right',
+        loader: 'eslint-loader',
+        query: {
+          configFile: '.eslintrc'
+        },
+      },
+      {
+        test: /\.js$/,
+        exclude: /(node_modules|bower_components)/,
+        loaders: ['babel', 'eslint-loader'],
+        include: path.join(__dirname, 'assets/scripts/src'),
+      }
+    ]
   }
 };
