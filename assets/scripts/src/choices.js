@@ -408,7 +408,6 @@ class Choices {
             // If we actually have anything to add to our dropdown
             // append it and highlight the first choice
             this.choiceList.appendChild(choiceListFragment);
-            this._highlightChoice();
           } else {
             const activeItems = this.store.getItemsFilteredByActive();
             const canAddItem = this._canAddItem(activeItems, this.input.value);
@@ -995,9 +994,9 @@ class Choices {
 
       if (canAddItem.response) {
         this._addItem(choice.value, choice.label, choice.id, choice.groupId);
-        this._triggerChange(choice.value);
       }
     }
+    this._triggerChange(choice.value);
 
     this.clearInput(this.passedElement);
 
@@ -1321,6 +1320,22 @@ class Choices {
     };
 
     const onEnterKey = () => {
+
+      if (hasActiveDropdown) {
+        const highlighted = this.dropdown.querySelector(`.${this.config.classNames.highlightedState}`);
+
+        // If we have a highlighted choice
+        if (highlighted) {
+          this._handleChoiceAction(activeItems, highlighted);
+        }
+      } else if (passedElementType === 'select-one') {
+        // Open single select dropdown if it's not active
+        if (!hasActiveDropdown) {
+          this.showDropdown(true);
+          e.preventDefault();
+        }
+      }
+
       // If enter key is pressed and the input has a value
       if (target.value) {
         const value = this.input.value;
@@ -1347,21 +1362,6 @@ class Choices {
       if (target.hasAttribute('data-button')) {
         this._handleButtonAction(activeItems, target);
         e.preventDefault();
-      }
-
-      if (hasActiveDropdown) {
-        const highlighted = this.dropdown.querySelector(`.${this.config.classNames.highlightedState}`);
-
-        // If we have a highlighted choice
-        if (highlighted) {
-          this._handleChoiceAction(activeItems, highlighted);
-        }
-      } else if (passedElementType === 'select-one') {
-        // Open single select dropdown if it's not active
-        if (!hasActiveDropdown) {
-          this.showDropdown(true);
-          e.preventDefault();
-        }
       }
     };
 
