@@ -114,18 +114,6 @@ class Choices {
       callbackOnSearch: null,
     };
 
-    // Merge options with user options
-    this.config = extend(defaultConfig, userConfig);
-
-    // Create data store
-    this.store = new Store(this.render);
-
-    // State tracking
-    this.initialised = false;
-    this.currentState = {};
-    this.prevState = {};
-    this.currentValue = '';
-
     // Retrieve triggering element (i.e. element with 'data-choice' trigger)
     this.element = element;
     this.passedElement = isType('String', element) ? document.querySelector(element) : element;
@@ -137,8 +125,14 @@ class Choices {
       return;
     }
 
-    this.highlightPosition = 0;
-    this.canSearch = this.config.search;
+    // It only makes sense for addItems to be true for
+    // text inputs by default
+    if (this.isSelectElement) {
+      defaultConfig.addItems = false;
+    }
+
+    // Merge options with user options
+    this.config = extend(defaultConfig, userConfig);
 
     // Assing preset choices from passed object
     this.presetChoices = this.config.choices;
@@ -170,7 +164,16 @@ class Choices {
     this._onPaste = this._onPaste.bind(this);
     this._onInput = this._onInput.bind(this);
 
-    // Monitor touch taps/scrolls
+    // Create data store
+    this.store = new Store(this.render);
+
+    // State tracking
+    this.initialised = false;
+    this.currentState = {};
+    this.prevState = {};
+    this.currentValue = '';
+    this.highlightPosition = 0;
+    this.canSearch = this.config.search;
     this.wasTap = true;
 
     // Cutting the mustard
@@ -413,7 +416,7 @@ class Choices {
             const canAddItem = this._canAddItem(activeItems, this.input.value);
             let dropdownItem = this._getTemplate('notice', this.config.noChoicesText);
 
-            if (canAddItem.notice) {
+            if (this.config.addItems && canAddItem.notice) {
               dropdownItem = this._getTemplate('notice', canAddItem.notice);
             } else if (this.isSearching) {
               dropdownItem = this._getTemplate('notice', this.config.noResultsText);
@@ -1045,17 +1048,17 @@ class Choices {
     let canAddItem = true;
     let notice = isType('Function', this.config.addItemText) ? this.config.addItemText(value) : this.config.addItemText;
 
-    if (this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
-      if (this.config.maxItemCount > 0 && this.config.maxItemCount <= this.itemList.children.length) {
-        // If there is a max entry limit and we have reached that limit
-        // don't update
-        canAddItem = false;
-        notice = isType('Function', this.config.maxItemText) ? this.config.maxItemText(this.config.maxItemCount) : this.config.maxItemText;
-      }
-    }
-
     if (this.config.addItems) {
       const isUnique = !activeItems.some((item) => item.value === value.trim());
+
+      if (this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
+        if (this.config.maxItemCount > 0 && this.config.maxItemCount <= this.itemList.children.length) {
+          // If there is a max entry limit and we have reached that limit
+          // don't update
+          canAddItem = false;
+          notice = isType('Function', this.config.maxItemText) ? this.config.maxItemText(this.config.maxItemCount) : this.config.maxItemText;
+        }
+      }
 
       // If a user has supplied a regular expression filter
       if (this.config.regexFilter) {
@@ -1320,13 +1323,11 @@ class Choices {
     };
 
     const onEnterKey = () => {
-      if (hasActiveDropdown) {
-        const highlighted = this.dropdown.querySelector(`.${this.config.classNames.highlightedState}`);
+      const highlighted = this.dropdown.querySelector(`.${this.config.classNames.highlightedState}`);
 
+      if (hasActiveDropdown && highlighted) {
         // If we have a highlighted choice, select it
-        if (highlighted) {
-          this._handleChoiceAction(activeItems, highlighted);
-        }
+        this._handleChoiceAction(activeItems, highlighted);
       } else if (passedElementType === 'select-one') {
         // Open single select dropdown if it's not active
         if (!hasActiveDropdown) {
@@ -1342,19 +1343,24 @@ class Choices {
 
         // All is good, add
         if (canAddItem.response) {
-          if (hasActiveDropdown) {
-            this.hideDropdown();
-          }
+          // Track whether we will end up adding an item
+          const willAddItem = this.isTextElement || (this.isSelectElement && this.config.addItems);
 
-          if (this.isTextElement) {
-            this._addItem(value);
-          } else {
-            this._addChoice(true, false, value, value);
-            this.containerOuter.focus();
-          }
+          if (willAddItem) {
+            if (hasActiveDropdown) {
+              this.hideDropdown();
+            }
 
-          this._triggerChange(value);
-          this.clearInput(this.passedElement);
+            if (this.isTextElement) {
+              this._addItem(value);
+            } else if(this.config.addItems) {
+              this._addChoice(true, false, value, value);
+              this.containerOuter.focus();
+            }
+
+            this._triggerChange(value);
+            this.clearInput(this.passedElement);
+          }
         }
       }
 
@@ -2160,7 +2166,10 @@ class Choices {
       }
     }
 
-    if (!this.config.addItems) this.disable();
+    // Disable text input if no entry allowed
+    if (!this.config.addItems && this.isTextElement) {
+      this.disable();
+    }
 
     containerOuter.appendChild(containerInner);
     containerOuter.appendChild(dropdown);
