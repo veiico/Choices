@@ -1586,30 +1586,42 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        // If enter key is pressed and the input has a value
 	        if (target.value) {
-	          var value = _this17.input.value;
-	          var canAddItem = _this17._canAddItem(activeItems, value);
+	          (function () {
+	            var value = _this17.input.value;
+	            var canAddItem = _this17._canAddItem(activeItems, value);
 
-	          // All is good, add
-	          if (canAddItem.response) {
-	            // Track whether we will end up adding an item
-	            var willAddItem = _this17.isTextElement || _this17.isSelectElement && _this17.config.addItems;
+	            // All is good, add
+	            if (canAddItem.response) {
+	              // Track whether we will end up adding an item
+	              var willAddItem = _this17.isTextElement || _this17.isSelectElement && _this17.config.addItems;
 
-	            if (willAddItem) {
-	              if (hasActiveDropdown) {
-	                _this17.hideDropdown();
+	              if (willAddItem) {
+	                if (hasActiveDropdown) {
+	                  _this17.hideDropdown();
+	                }
+
+	                if (_this17.isTextElement) {
+	                  _this17._addItem(value);
+	                } else {
+	                  var isUnique = void 0;
+	                  if (!duplicateItems) {
+	                    existingChoice = !_this17.store.getItems().filter(function (item) {
+	                      return item.value === value.trim();
+	                    });
+	                  }
+	                  if (duplicateItems) {
+	                    _this17._addChoice(true, false, value, value);
+	                  } else {
+	                    _this17._addItem(existingChoice.value, existingChoice.label, existingChoice.id);
+	                  }
+	                  _this17.containerOuter.focus();
+	                }
+
+	                _this17._triggerChange(value);
+	                _this17.clearInput(_this17.passedElement);
 	              }
-
-	              if (_this17.isTextElement) {
-	                _this17._addItem(value);
-	              } else if (_this17.config.addItems) {
-	                _this17._addChoice(true, false, value, value);
-	                _this17.containerOuter.focus();
-	              }
-
-	              _this17._triggerChange(value);
-	              _this17.clearInput(_this17.passedElement);
 	            }
-	          }
+	          })();
 	        }
 
 	        if (target.hasAttribute('data-button')) {
