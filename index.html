@@ -137,6 +137,14 @@
         <option value="Dropdown item 4" disabled>Dropdown item 4</option>
       </select>
 
+      <label for="choices-multiple-add-items">Add items if they don't exist</label>
+      <select class="form-control" name="choices-multiple-add-items" id="choices-multiple-add-items" placeholder="This is a placeholder" multiple>
+        <option value="React">England</option>
+        <option value="React">Wales</option>
+        <option value="React">Scotland</option>
+        <option value="React">Northern Ireland</option>
+      </select>
+
       <hr>
 
       <h2>Single select input</h2>
@@ -349,7 +357,12 @@
 
       var multipleCancelButton = new Choices('#choices-multiple-remove-button', {
         removeItemButton: true,
-      })
+      });
+
+      var multipleAddItems = new Choices('#choices-multiple-add-items', {
+        addItems: true,
+        duplicateItems: false,
+      });
 
       var singleFetch = new Choices('#choices-single-remote-fetch', {
         placeholder: true,
