@@ -1451,7 +1451,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_addEventListeners',
 	    value: function _addEventListeners() {
-	      document.addEventListener('keyup', this._onKeyUp);
+	      document.addEventListener('keypress', this._onKeyUp);
 	      document.addEventListener('keydown', this._onKeyDown);
 	      document.addEventListener('click', this._onClick);
 	      document.addEventListener('touchmove', this._onTouchMove);
@@ -1809,13 +1809,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _onMouseDown(e) {
 	      var target = e.target;
 	      if (this.containerOuter.contains(target) && target !== this.input) {
+	        var foundTarget = void 0;
 	        var activeItems = this.store.getItemsFilteredByActive();
 	        var hasShiftKey = e.shiftKey;
-	        var foundTarget = void 0;
 
-	        if (foundTarget = (0, _utils.findAncestorByAttr)(target, 'data-item')) {
+	        if (foundTarget = (0, _utils.findAncestorByAttrName)(target, 'data-item')) {
 	          this._handleItemAction(activeItems, foundTarget, hasShiftKey);
-	        } else if (foundTarget = (0, _utils.findAncestorByAttr)(target, 'data-choice')) {
+	        } else if (foundTarget = (0, _utils.findAncestorByAttrName)(target, 'data-choice')) {
 	          this._handleChoiceAction(activeItems, foundTarget);
 	        }
 
@@ -5294,7 +5294,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param  {string} attr Attribute name of parent
 	 * @return {?NodeElement}     Found parent element or null
 	 */
-	var findAncestorByAttr = exports.findAncestorByAttr = function findAncestorByAttr(el, attr) {
+	var findAncestorByAttrName = exports.findAncestorByAttrName = function findAncestorByAttrName(el, attr) {
 	  var target = el;
 
 	  while (target) {
