@@ -1233,7 +1233,7 @@ class Choices {
    * @private
    */
   _addEventListeners() {
-    document.addEventListener('keypress', this._onKeyUp);
+    document.addEventListener('keyup', this._onKeyUp);
     document.addEventListener('keydown', this._onKeyDown);
     document.addEventListener('click', this._onClick);
     document.addEventListener('touchmove', this._onTouchMove);
